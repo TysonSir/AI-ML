@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 import time
 import traceback
+DEBUG = False # 是否输出每次学习的Q-Table信息
 
 N_STATES = 6   # 1维世界的宽度
 ACTIONS = ['left', 'right']     # 探索者的可用动作
@@ -63,7 +64,8 @@ def update_env(S, episode, step_counter):
         interaction = 'Episode %s: total_steps = %s' % (episode+1, step_counter)
         print('\r{}'.format(interaction), end='')
         time.sleep(2)
-        print('\r                                ', end='')
+        if not DEBUG:
+            print('\r                                ', end='')
     else:
         env_list[S] = 'o'
         interaction = ''.join(env_list)
@@ -74,6 +76,8 @@ def update_env(S, episode, step_counter):
 def RL():
     q_table = build_q_table(N_STATES, ACTIONS)  # 初始 q table
     for episode in range(MAX_EPISODES):     # 回合
+        if DEBUG:
+            print('\r\nQ-table:\n', q_table, '\n')
         step_counter = 0
         S = 0   # 回合初始位置
         is_terminated = False   # 是否回合结束
@@ -97,9 +101,9 @@ def RL():
             update_env(S, episode, step_counter+1)  # 环境更新
 
             step_counter += 1
+
     return q_table
 
 if __name__ == "__main__":
     q_table = RL()
-    print('\r\nQ-table:\n')
-    print(q_table)
+    print('\r\n最终：Q-table:\n', q_table)

@@ -55,3 +55,21 @@ my_json_data = [
 df = pd.DataFrame(my_json_data, index=["jack", "rose"])
 print(df)
 print(df.to_numpy())
+
+df = df.append(
+    pd.Series(
+        [0, 0],
+        index=df.columns,
+        name='nick',
+    )
+)
+print(df)
+
+df = pd.concat([df,
+    pd.Series(
+        [0, 0],
+        index=df.columns,
+        name='tim',
+    ).to_frame().T
+])
+print(df)

@@ -29,9 +29,6 @@ class RL(object):
                 ).to_frame().T
             ])
 
-    def print_q_table(self):
-        print('\r\nQ-table:\n', self.q_table, '\n')
-
     def choose_action(self, observation):
         self.check_state_exist(observation)
         # action selection
@@ -49,26 +46,27 @@ class RL(object):
         pass
 
 
-# off-policy
-class QLearningTable(RL):
-    def __init__(self, actions, learning_rate=0.01, reward_decay=0.9, e_greedy=0.9):
-        super(QLearningTable, self).__init__(actions, learning_rate, reward_decay, e_greedy)
+# backward eligibility traces
+class SarsaLambdaTable(RL):
+    def __init__(self, actions, learning_rate=0.01, reward_decay=0.9, e_greedy=0.9, trace_decay=0.9):
+        super(SarsaLambdaTable, self).__init__(actions, learning_rate, reward_decay, e_greedy)
 
-    def learn(self, s, a, r, s_):
-        self.check_state_exist(s_)
-        q_predict = self.q_table.loc[s, a]
-        if s_ != 'terminal':
-            q_target = r + self.gamma * self.q_table.loc[s_, :].max()  # next state is not terminal
-        else:
-            q_target = r  # next state is terminal
-        self.q_table.loc[s, a] += self.lr * (q_target - q_predict)  # update
+        # backward view, eligibility trace.
+        self.lambda_ = trace_decay
+        self.eligibility_trace = self.q_table.copy()
 
+    def check_state_exist(self, state):
+        if state not in self.q_table.index:
+            # append new state to q table
+            to_be_append = pd.Series(
+                    [0] * len(self.actions),
+                    index=self.q_table.columns,
+                    name=state,
+                ).to_frame().T
+            self.q_table = pd.concat([self.q_table, to_be_append])
 
-# on-policy
-class SarsaTable(RL):
-
-    def __init__(self, actions, learning_rate=0.01, reward_decay=0.9, e_greedy=0.9):
-        super(SarsaTable, self).__init__(actions, learning_rate, reward_decay, e_greedy)
+            # also update eligibility trace
+            self.eligibility_trace = pd.concat([self.eligibility_trace, to_be_append])
 
     def learn(self, s, a, r, s_, a_):
         self.check_state_exist(s_)
@@ -77,4 +75,19 @@ class SarsaTable(RL):
             q_target = r + self.gamma * self.q_table.loc[s_, a_]  # next state is not terminal
         else:
             q_target = r  # next state is terminal
-        self.q_table.loc[s, a] += self.lr * (q_target - q_predict)  # update
+        error = q_target - q_predict
+
+        # increase trace amount for visited state-action pair
+
+        # Method 1:
+        # self.eligibility_trace.loc[s, a] += 1
+
+        # Method 2:
+        self.eligibility_trace.loc[s, :] *= 0
+        self.eligibility_trace.loc[s, a] = 1
+
+        # Q update
+        self.q_table += self.lr * error * self.eligibility_trace
+
+        # decay eligibility trace after update
+        self.eligibility_trace *= self.gamma*self.lambda_

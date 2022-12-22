@@ -22,7 +22,7 @@ else:
 from PIL import Image, ImageTk # pip install Pillow
 
 UNIT = 40   # pixels
-SIZE = 4
+SIZE = 5
 MAZE_H = SIZE  # grid height
 MAZE_W = SIZE  # grid width
 
@@ -31,7 +31,7 @@ class Maze(tk.Tk, object):
         super(Maze, self).__init__()
         self.action_space = ['u', 'd', 'l', 'r']
         self.n_actions = len(self.action_space)
-        self.title('maze')
+        self.title('寻宝')
         self.geometry('{0}x{1}'.format(MAZE_W * UNIT, MAZE_H * UNIT))
 
         self.hell_list = []
@@ -78,10 +78,10 @@ class Maze(tk.Tk, object):
         # create grids
         for c in range(0, MAZE_W * UNIT, UNIT):
             x0, y0, x1, y1 = c, 0, c, MAZE_H * UNIT
-            self.canvas.create_line(x0, y0, x1, y1)
+            self.canvas.create_line(x0, y0, x1, y1, fill='lightskyblue')
         for r in range(0, MAZE_H * UNIT, UNIT):
             x0, y0, x1, y1 = 0, r, MAZE_W * UNIT, r
-            self.canvas.create_line(x0, y0, x1, y1)
+            self.canvas.create_line(x0, y0, x1, y1, fill='lightskyblue')
 
         # create origin
         origin = np.array([20, 20])
@@ -90,6 +90,8 @@ class Maze(tk.Tk, object):
         self._create_hell(origin, 2, 4)
         self._create_hell(origin, 3, 4)
         self._create_hell(origin, 4, 1)
+        self._create_hell(origin, 4, 5)
+        self._create_hell(origin, 5, 3)
 
         # create oval
         oval_center = origin + UNIT * (SIZE - 1)

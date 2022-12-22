@@ -19,13 +19,12 @@ if sys.version_info.major == 2:
     import Tkinter as tk
 else:
     import tkinter as tk
-
+from PIL import Image, ImageTk # pip install Pillow
 
 UNIT = 40   # pixels
 SIZE = 4
 MAZE_H = SIZE  # grid height
 MAZE_W = SIZE  # grid width
-
 
 class Maze(tk.Tk, object):
     def __init__(self):
@@ -37,6 +36,12 @@ class Maze(tk.Tk, object):
 
         self.hell_list = []
         self._build_maze()
+
+    def _set_image(self, img_path, start_x, start_y):
+        global img, photo
+        img = Image.open(img_path).resize((UNIT, UNIT), Image.ANTIALIAS)
+        photo = ImageTk.PhotoImage(img)
+        self.canvas.create_image(start_x, start_y,anchor = tk.NW,image=photo)
 
     def _create_hell(self, origin, x, y):
         x, y = x - 1, y - 1
@@ -74,6 +79,7 @@ class Maze(tk.Tk, object):
             oval_center[0] - 15, oval_center[1] - 15,
             oval_center[0] + 15, oval_center[1] + 15,
             fill='yellow')
+        self._set_image('./env_img/goal.png', oval_center[0] - UNIT/2, oval_center[1] - UNIT/2)
 
         # create red rect
         self.rect = self.canvas.create_rectangle(

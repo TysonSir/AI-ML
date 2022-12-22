@@ -22,8 +22,9 @@ else:
 
 
 UNIT = 40   # pixels
-MAZE_H = 4  # grid height
-MAZE_W = 4  # grid width
+SIZE = 4
+MAZE_H = SIZE  # grid height
+MAZE_W = SIZE  # grid width
 
 
 class Maze(tk.Tk, object):
@@ -33,7 +34,18 @@ class Maze(tk.Tk, object):
         self.n_actions = len(self.action_space)
         self.title('maze')
         self.geometry('{0}x{1}'.format(MAZE_W * UNIT, MAZE_H * UNIT))
+
+        self.hell_list = []
         self._build_maze()
+
+    def _create_hell(self, origin, x, y):
+        x, y = x - 1, y - 1
+        hell_center = origin + np.array([UNIT * y, UNIT * x])
+        hell = self.canvas.create_rectangle(
+            hell_center[0] - 15, hell_center[1] - 15,
+            hell_center[0] + 15, hell_center[1] + 15,
+            fill='black')
+        self.hell_list.append(hell)
 
     def _build_maze(self):
         self.canvas = tk.Canvas(self, bg='white',
@@ -51,21 +63,13 @@ class Maze(tk.Tk, object):
         # create origin
         origin = np.array([20, 20])
 
-        # hell
-        hell1_center = origin + np.array([UNIT * 2, UNIT])
-        self.hell1 = self.canvas.create_rectangle(
-            hell1_center[0] - 15, hell1_center[1] - 15,
-            hell1_center[0] + 15, hell1_center[1] + 15,
-            fill='black')
-        # hell
-        hell2_center = origin + np.array([UNIT, UNIT * 2])
-        self.hell2 = self.canvas.create_rectangle(
-            hell2_center[0] - 15, hell2_center[1] - 15,
-            hell2_center[0] + 15, hell2_center[1] + 15,
-            fill='black')
+        self._create_hell(origin, 2, 2)
+        self._create_hell(origin, 2, 4)
+        self._create_hell(origin, 3, 4)
+        self._create_hell(origin, 4, 1)
 
         # create oval
-        oval_center = origin + UNIT * 2
+        oval_center = origin + UNIT * (SIZE - 1)
         self.oval = self.canvas.create_oval(
             oval_center[0] - 15, oval_center[1] - 15,
             oval_center[0] + 15, oval_center[1] + 15,
@@ -117,7 +121,7 @@ class Maze(tk.Tk, object):
             reward = 1
             done = True
             s_ = 'terminal'
-        elif s_ in [self.canvas.coords(self.hell1), self.canvas.coords(self.hell2)]:
+        elif s_ in [self.canvas.coords(hell) for hell in self.hell_list]:
             reward = -1
             done = True
             s_ = 'terminal'

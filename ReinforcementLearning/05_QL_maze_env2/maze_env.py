@@ -35,13 +35,14 @@ class Maze(tk.Tk, object):
         self.geometry('{0}x{1}'.format(MAZE_W * UNIT, MAZE_H * UNIT))
 
         self.hell_list = []
+        self.img_list = []
         self._build_maze()
 
-    def _set_image(self, img_path, start_x, start_y):
-        global img, photo
-        img = Image.open(img_path).resize((UNIT, UNIT), Image.ANTIALIAS)
+    def _set_image(self, img_path, start_x, start_y, size=UNIT):
+        img = Image.open(img_path).resize((size, size), Image.ANTIALIAS)
         photo = ImageTk.PhotoImage(img)
-        self.canvas.create_image(start_x, start_y,anchor = tk.NW,image=photo)
+        self.img_list.append((img, photo))
+        self.canvas.create_image(start_x, start_y, anchor=tk.NW, image=self.img_list[-1][1])
 
     def _create_hell(self, origin, x, y):
         x, y = x - 1, y - 1
@@ -49,8 +50,9 @@ class Maze(tk.Tk, object):
         hell = self.canvas.create_rectangle(
             hell_center[0] - 15, hell_center[1] - 15,
             hell_center[0] + 15, hell_center[1] + 15,
-            fill='black')
+            fill='white')
         self.hell_list.append(hell)
+        self._set_image('./env_img/water.png', hell_center[0] - UNIT/2 + 2, hell_center[1] - UNIT/2 + 2, 36)
 
     def _build_maze(self):
         self.canvas = tk.Canvas(self, bg='white',

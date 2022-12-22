@@ -42,7 +42,7 @@ class Maze(tk.Tk, object):
         img = Image.open(img_path).resize((size, size), Image.ANTIALIAS)
         photo = ImageTk.PhotoImage(img)
         self.img_list.append((img, photo))
-        self.canvas.create_image(start_x, start_y, anchor=tk.NW, image=self.img_list[-1][1])
+        return self.canvas.create_image(start_x, start_y, anchor=tk.NW, image=self.img_list[-1][1])
 
     def _create_hell(self, origin, x, y):
         x, y = x - 1, y - 1
@@ -50,9 +50,25 @@ class Maze(tk.Tk, object):
         hell = self.canvas.create_rectangle(
             hell_center[0] - 15, hell_center[1] - 15,
             hell_center[0] + 15, hell_center[1] + 15,
-            fill='white')
+            fill='white', width=0)
         self.hell_list.append(hell)
         self._set_image('./env_img/water.png', hell_center[0] - UNIT/2 + 2, hell_center[1] - UNIT/2 + 2, 36)
+
+    def _create_human(self, origin):
+        self.rect = self.canvas.create_rectangle(
+            origin[0] - 15, origin[1] - 15,
+            origin[0] + 15, origin[1] + 15,
+            width=0
+        )
+        self.human = self._set_image('./env_img/human.png', origin[0] - UNIT/2 + 2, origin[1] - UNIT/2 + 2, 36)
+    
+    def _delete_human(self):
+        self.canvas.delete(self.rect)
+        self.canvas.delete(self.human)
+    
+    def _move_human(self, move_x, move_y):
+        self.canvas.move(self.rect, move_x, move_y)  # move agent
+        self.canvas.move(self.human, move_x, move_y)  # move agent
 
     def _build_maze(self):
         self.canvas = tk.Canvas(self, bg='white',
@@ -81,13 +97,10 @@ class Maze(tk.Tk, object):
             oval_center[0] - 15, oval_center[1] - 15,
             oval_center[0] + 15, oval_center[1] + 15,
             fill='yellow')
-        self._set_image('./env_img/goal.png', oval_center[0] - UNIT/2, oval_center[1] - UNIT/2)
+        self._set_image('./env_img/goal.png', oval_center[0] - UNIT/2 + 3, oval_center[1] - UNIT/2 + 3, 34)
 
         # create red rect
-        self.rect = self.canvas.create_rectangle(
-            origin[0] - 15, origin[1] - 15,
-            origin[0] + 15, origin[1] + 15,
-            fill='red')
+        self._create_human(origin)
 
         # pack all
         self.canvas.pack()
@@ -95,12 +108,11 @@ class Maze(tk.Tk, object):
     def reset(self):
         self.update()
         time.sleep(0.5)
-        self.canvas.delete(self.rect)
+
+        self._delete_human()
+
         origin = np.array([20, 20])
-        self.rect = self.canvas.create_rectangle(
-            origin[0] - 15, origin[1] - 15,
-            origin[0] + 15, origin[1] + 15,
-            fill='red')
+        self._create_human(origin)
         # return observation
         return self.canvas.coords(self.rect)
 
@@ -120,7 +132,7 @@ class Maze(tk.Tk, object):
             if s[0] > UNIT:
                 base_action[0] -= UNIT
 
-        self.canvas.move(self.rect, base_action[0], base_action[1])  # move agent
+        self._move_human(base_action[0], base_action[1])
 
         s_ = self.canvas.coords(self.rect)  # next state
 

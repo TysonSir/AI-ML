@@ -27,8 +27,9 @@ MAZE_H = SIZE  # grid height
 MAZE_W = SIZE  # grid width
 
 class Maze(tk.Tk, object):
-    def __init__(self):
+    def __init__(self, is_quick=False):
         super(Maze, self).__init__()
+        self.is_sleep = not is_quick # 控制time.sleep
         self.action_space = ['u', 'd', 'l', 'r']
         self.n_actions = len(self.action_space)
         self.title('寻宝')
@@ -109,7 +110,8 @@ class Maze(tk.Tk, object):
 
     def reset(self):
         self.update()
-        time.sleep(0.5)
+        if self.is_sleep:
+            time.sleep(0.5)
 
         self._delete_human()
 
@@ -154,7 +156,8 @@ class Maze(tk.Tk, object):
         return s_, reward, done
 
     def render(self):
-        time.sleep(0.1)
+        if self.is_sleep:
+            time.sleep(0.1)
         self.update()
 
 

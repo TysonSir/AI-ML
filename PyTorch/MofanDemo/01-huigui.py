@@ -1,3 +1,6 @@
+'''
+pytorch==1.4测试
+'''
 import torch
 import matplotlib.pyplot as plt
 import torch.nn.functional as F     # 激励函数都在这

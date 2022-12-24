@@ -84,6 +84,11 @@ for epoch in range(EPOCH):
         optimizer.zero_grad()           # clear gradients for this training step
         loss.backward()                 # backpropagation, compute gradients
         optimizer.step()                # apply gradients
+
+        if step % 50 == 0:
+            accuracy = 0
+            print('Epoch: ', epoch, '| train loss: %.4f' % loss.data.numpy(), '| test accuracy: %.2f' % accuracy)
+
 """
 ...
 Epoch:  0 | train loss: 0.0945 | test accuracy: 0.94

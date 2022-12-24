@@ -1,6 +1,7 @@
 import torch
 from torch import nn
 import torch.utils.data as Data
+from torch.autograd import Variable
 import torchvision
 import torchvision.datasets as dsets
 import torchvision.transforms as transforms
@@ -28,14 +29,14 @@ train_data = torchvision.datasets.MNIST(
 )
 
 
-test_data = torchvision.datasets.MNIST(root='./mnist/', train=False)
+test_data = torchvision.datasets.MNIST(root='./mnist/', train=False, transform=torchvision.transforms.ToTensor())
 
 # 批训练 50samples, 1 channel, 28x28 (50, 1, 28, 28)
 train_loader = Data.DataLoader(dataset=train_data, batch_size=BATCH_SIZE, shuffle=True)
 
 # 为了节约时间, 我们测试时只测试前2000个
-test_x = torch.unsqueeze(test_data.test_data, dim=1).type(torch.FloatTensor)[:2000]/255.   # shape from (2000, 28, 28) to (2000, 1, 28, 28), value in range(0,1)
-test_y = test_data.test_labels[:2000]
+test_x = Variable(test_data.test_data, volatile=True).type(torch.FloatTensor)[:2000]/255.   # shape from (2000, 28, 28) to (2000, 1, 28, 28), value in range(0,1)
+test_y = test_data.test_labels.numpy().squeeze()[:2000]
 
 class RNN(nn.Module):
     def __init__(self):
@@ -86,7 +87,9 @@ for epoch in range(EPOCH):
         optimizer.step()                # apply gradients
 
         if step % 50 == 0:
-            accuracy = 0
+            test_output = rnn(test_x)
+            pred_y = torch.max(test_output, 1)[1].data.numpy().squeeze()
+            accuracy = sum(pred_y == test_y) / test_y.size
             print('Epoch: ', epoch, '| train loss: %.4f' % loss.data.numpy(), '| test accuracy: %.2f' % accuracy)
 
 """

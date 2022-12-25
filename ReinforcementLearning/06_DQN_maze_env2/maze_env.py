@@ -11,7 +11,7 @@ This script is the environment part of this example. The RL is in RL_brain.py.
 View more on my tutorial page: https://morvanzhou.github.io/tutorials/
 """
 
-
+import os
 import numpy as np
 import time
 import sys
@@ -20,6 +20,9 @@ if sys.version_info.major == 2:
 else:
     import tkinter as tk
 from PIL import Image, ImageTk # pip install Pillow
+
+work_dir = os.path.dirname(os.path.realpath(__file__))
+os.chdir(work_dir)
 
 UNIT = 40   # pixels
 SIZE = 5
@@ -144,11 +147,9 @@ class Maze(tk.Tk, object):
         if s_ == self.canvas.coords(self.oval):
             reward = 1
             done = True
-            s_ = 'terminal'
         elif s_ in [self.canvas.coords(hell) for hell in self.hell_list]:
             reward = -1
             done = True
-            s_ = 'terminal'
         else:
             reward = 0
             done = False

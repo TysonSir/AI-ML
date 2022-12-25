@@ -31,7 +31,8 @@ MEMORY_CAPACITY = 2000
 
 env = maze_env.Maze(is_quick=False)
 N_ACTIONS = len(env.action_space)
-N_STATES = maze_env.SIZE * maze_env.SIZE
+# N_STATES = maze_env.SIZE * maze_env.SIZE
+N_STATES = 4 # 神经网络输入状态坐标维度
 
 
 class Net(nn.Module):
@@ -65,6 +66,7 @@ class DQN(object):
         if np.random.uniform() < EPSILON:   # greedy
             actions_value = self.eval_net.forward(x)
             action = torch.max(actions_value, 1)[1].data.numpy()
+            action = action[0]
         else:   # random
             action = np.random.randint(0, N_ACTIONS)
         return action
@@ -106,7 +108,6 @@ def update():
     print('\nCollecting experience...')
     for i_episode in range(400):
         s = env.reset()
-        s = s[0]
         ep_r = 0
         while True:
             env.render()

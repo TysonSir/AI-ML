@@ -6,6 +6,13 @@ Dependencies:
 torch: 0.4
 gym: 0.8.1
 numpy
+
+# 实际运行
+torch               1.4.0+cpu
+torchvision         0.5.0+cpu
+gym                 0.26.2
+gym-notices         0.0.8
+pygame              2.1.0
 """
 import torch
 import torch.nn as nn

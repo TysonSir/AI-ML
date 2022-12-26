@@ -31,7 +31,6 @@ MEMORY_CAPACITY = 2000
 
 env = maze_env.Maze(is_quick=True)
 N_ACTIONS = len(env.action_space)
-# N_STATES = maze_env.SIZE * maze_env.SIZE
 N_STATES = 4 # 神经网络输入状态坐标维度
 
 

@@ -11,20 +11,48 @@ This script is the environment part of this example. The RL is in RL_brain.py.
 View more on my tutorial page: https://morvanzhou.github.io/tutorials/
 """
 
-
+import os
 import numpy as np
 import time
-import sys
-if sys.version_info.major == 2:
-    import Tkinter as tk
-else:
-    import tkinter as tk
+import tkinter as tk
 from PIL import Image, ImageTk # pip install Pillow
 
+work_dir = os.path.dirname(os.path.realpath(__file__))
+os.chdir(work_dir)
+
+# DEFAULT_MAZE_MAP = \
+# [
+#     [3, 0, 0, 0],
+#     [0, 0, 1, 0],
+#     [0, 0, 0, 0],
+#     [0, 0, 0, 2],
+# ]
+DEFAULT_MAZE_MAP = \
+[
+    [3, 0, 1, 0, 0, 0, 0],
+    [0, 0, 1, 0, 0, 0, 0],
+    [0, 0, 1, 0, 0, 1, 0],
+    [0, 0, 0, 0, 1, 0, 0],
+    [0, 0, 0, 1, 0, 0, 2],
+]
+# DEFAULT_MAZE_MAP = \
+# [
+#     [3, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0],
+#     [0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0],
+#     [0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0],
+#     [0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0],
+#     [0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0],
+#     [1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0],
+#     [0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0],
+#     [0, 1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0],
+#     [0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0],
+#     [0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0],
+#     [0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 2],
+# ]
+
 UNIT = 40   # pixels
-SIZE = 5
-MAZE_H = SIZE  # grid height
-MAZE_W = SIZE  # grid width
+MAZE_H = len(DEFAULT_MAZE_MAP)  # grid height
+MAZE_W = len(DEFAULT_MAZE_MAP[0])  # grid width
 
 class Maze(tk.Tk, object):
     def __init__(self, is_quick=False):
@@ -46,7 +74,7 @@ class Maze(tk.Tk, object):
         return self.canvas.create_image(start_x, start_y, anchor=tk.NW, image=self.img_list[-1][1])
 
     def _create_hell(self, origin, x, y):
-        x, y = x - 1, y - 1
+        # x, y = x - 1, y - 1
         hell_center = origin + np.array([UNIT * y, UNIT * x])
         hell = self.canvas.create_rectangle(
             hell_center[0] - 15, hell_center[1] - 15,
@@ -55,6 +83,15 @@ class Maze(tk.Tk, object):
         self.hell_list.append(hell)
         self._set_image('./env_img/water.png', hell_center[0] - UNIT/2 + 2, hell_center[1] - UNIT/2 + 2, 36)
 
+    # def _create_human(self, origin, x, y):
+    #     human_center = origin + np.array([UNIT * y, UNIT * x])
+    #     self.rect = self.canvas.create_rectangle(
+    #         human_center[0] - 15, human_center[1] - 15,
+    #         human_center[0] + 15, human_center[1] + 15,
+    #         width=0
+    #     )
+    #     self.human = self._set_image('./env_img/human.png', human_center[0] - UNIT/2 + 2, human_center[1] - UNIT/2 + 2, 36)
+    
     def _create_human(self, origin):
         self.rect = self.canvas.create_rectangle(
             origin[0] - 15, origin[1] - 15,
@@ -87,15 +124,21 @@ class Maze(tk.Tk, object):
         # create origin
         origin = np.array([20, 20])
 
-        self._create_hell(origin, 2, 2)
-        self._create_hell(origin, 2, 4)
-        self._create_hell(origin, 3, 4)
-        self._create_hell(origin, 4, 1)
-        self._create_hell(origin, 4, 5)
-        self._create_hell(origin, 5, 3)
+        # draw hell
+        self.human_r_c = (0, 0)
+        oval_r_c = (0, 0)
+        for row in range(MAZE_H):
+            for col in range(MAZE_W):
+                if DEFAULT_MAZE_MAP[row][col] == 1:
+                    self._create_hell(origin, row, col)
+                if DEFAULT_MAZE_MAP[row][col] == 2:
+                    oval_r_c = (row, col)
+                if DEFAULT_MAZE_MAP[row][col] == 3:
+                    self.human_r_c = (row, col)
 
         # create oval
-        oval_center = origin + UNIT * (SIZE - 1)
+        oval_x, oval_y = oval_r_c[0], oval_r_c[1]
+        oval_center = origin + np.array([UNIT * oval_y, UNIT * oval_x])
         self.oval = self.canvas.create_oval(
             oval_center[0] - 15, oval_center[1] - 15,
             oval_center[0] + 15, oval_center[1] + 15,
@@ -103,6 +146,7 @@ class Maze(tk.Tk, object):
         self._set_image('./env_img/goal.png', oval_center[0] - UNIT/2 + 3, oval_center[1] - UNIT/2 + 3, 34)
 
         # create red rect
+        # self._create_human(origin, self.human_r_c[0], self.human_r_c[1])
         self._create_human(origin)
 
         # pack all
@@ -116,7 +160,9 @@ class Maze(tk.Tk, object):
         self._delete_human()
 
         origin = np.array([20, 20])
+        # self._create_human(origin, self.human_r_c[0], self.human_r_c[1])
         self._create_human(origin)
+
         # return observation
         return self.canvas.coords(self.rect)
 

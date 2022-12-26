@@ -114,6 +114,7 @@ def update():
             list_textbook.append(row[2].split('-')) # actions: 3,2,0,1,1,1,2,2,0,0,2,0,2,2,1,1,1,1
 
     print('\nCollecting experience...')
+    success_num = 0
     for i_episode in range(400):
         s = env.reset()
         ep_r = 0
@@ -139,12 +140,13 @@ def update():
             if done:
                 if r == 1:
                     print([f'[{i_episode}] reward={r}'])
+                    success_num += 1
                 break
             s = s_
             i_step += 1
 
     # end of game
-    print('game over')
+    print('game over.', f'success {success_num} times.')
     env.destroy()
 
 if __name__ == "__main__":

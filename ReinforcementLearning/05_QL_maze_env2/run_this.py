@@ -62,7 +62,7 @@ def update():
 
     pd.DataFrame(success_actions, columns=['episode', 'actions']).to_csv('success_actions.csv')
     # end of game
-    print('game over')
+    print('game over', f'success {len(success_actions)} times.')
     env.destroy()
 
 if __name__ == "__main__":

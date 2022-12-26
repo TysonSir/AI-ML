@@ -14,20 +14,16 @@ View more on my tutorial page: https://morvanzhou.github.io/tutorials/
 import os
 import numpy as np
 import time
-import sys
-if sys.version_info.major == 2:
-    import Tkinter as tk
-else:
-    import tkinter as tk
+import tkinter as tk
 from PIL import Image, ImageTk # pip install Pillow
 
 work_dir = os.path.dirname(os.path.realpath(__file__))
 os.chdir(work_dir)
 
 UNIT = 40   # pixels
-SIZE = 5
-MAZE_H = SIZE  # grid height
-MAZE_W = SIZE  # grid width
+
+MAZE_H = 5  # grid height
+MAZE_W = 5  # grid width
 
 class Maze(tk.Tk, object):
     def __init__(self, is_quick=False):
@@ -98,7 +94,8 @@ class Maze(tk.Tk, object):
         self._create_hell(origin, 5, 3)
 
         # create oval
-        oval_center = origin + UNIT * (SIZE - 1)
+        oval_x, oval_y = (MAZE_W - 1), (MAZE_H - 2)
+        oval_center = origin + np.array([UNIT * oval_y, UNIT * oval_x])
         self.oval = self.canvas.create_oval(
             oval_center[0] - 15, oval_center[1] - 15,
             oval_center[0] + 15, oval_center[1] + 15,

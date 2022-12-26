@@ -22,7 +22,7 @@ os.chdir(work_dir)
 
 DEFAULT_MAZE_MAP = \
 [
-    [0, 0, 1, 0, 0, 0, 0],
+    [3, 0, 1, 0, 0, 0, 0],
     [0, 0, 1, 0, 0, 0, 0],
     [0, 0, 1, 0, 0, 1, 0],
     [0, 0, 0, 0, 1, 0, 0],
@@ -62,6 +62,15 @@ class Maze(tk.Tk, object):
         self.hell_list.append(hell)
         self._set_image('./env_img/water.png', hell_center[0] - UNIT/2 + 2, hell_center[1] - UNIT/2 + 2, 36)
 
+    # def _create_human(self, origin, x, y):
+    #     human_center = origin + np.array([UNIT * y, UNIT * x])
+    #     self.rect = self.canvas.create_rectangle(
+    #         human_center[0] - 15, human_center[1] - 15,
+    #         human_center[0] + 15, human_center[1] + 15,
+    #         width=0
+    #     )
+    #     self.human = self._set_image('./env_img/human.png', human_center[0] - UNIT/2 + 2, human_center[1] - UNIT/2 + 2, 36)
+    
     def _create_human(self, origin):
         self.rect = self.canvas.create_rectangle(
             origin[0] - 15, origin[1] - 15,
@@ -95,13 +104,19 @@ class Maze(tk.Tk, object):
         origin = np.array([20, 20])
 
         # draw hell
+        self.human_r_c = (0, 0)
+        oval_r_c = (0, 0)
         for row in range(MAZE_H):
             for col in range(MAZE_W):
                 if DEFAULT_MAZE_MAP[row][col] == 1:
                     self._create_hell(origin, row, col)
+                if DEFAULT_MAZE_MAP[row][col] == 2:
+                    oval_r_c = (row, col)
+                if DEFAULT_MAZE_MAP[row][col] == 3:
+                    self.human_r_c = (row, col)
 
         # create oval
-        oval_x, oval_y = (MAZE_H - 1), (MAZE_W - 1)
+        oval_x, oval_y = oval_r_c[0], oval_r_c[1]
         oval_center = origin + np.array([UNIT * oval_y, UNIT * oval_x])
         self.oval = self.canvas.create_oval(
             oval_center[0] - 15, oval_center[1] - 15,
@@ -110,6 +125,7 @@ class Maze(tk.Tk, object):
         self._set_image('./env_img/goal.png', oval_center[0] - UNIT/2 + 3, oval_center[1] - UNIT/2 + 3, 34)
 
         # create red rect
+        # self._create_human(origin, self.human_r_c[0], self.human_r_c[1])
         self._create_human(origin)
 
         # pack all
@@ -123,7 +139,9 @@ class Maze(tk.Tk, object):
         self._delete_human()
 
         origin = np.array([20, 20])
+        # self._create_human(origin, self.human_r_c[0], self.human_r_c[1])
         self._create_human(origin)
+
         # return observation
         return self.canvas.coords(self.rect)
 

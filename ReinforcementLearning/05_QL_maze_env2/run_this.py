@@ -15,7 +15,10 @@ import pandas as pd
 from maze_env import Maze
 from RL_brain import QLearningTable
 
-EDUCATE_FIRST = True # 是否先用正确的步骤训练一下
+# 训练目标：连续 TARGET_TIMES 次找到宝藏
+TARGET_TIMES = 10
+
+EDUCATE_FIRST = False # 是否先用正确的步骤训练一下
 
 def update():
     if EDUCATE_FIRST:
@@ -24,8 +27,9 @@ def update():
         for row in df_textbook.itertuples():
             list_textbook.append(row[2].split('-')) # actions: 3,2,0,1,1,1,2,2,0,0,2,0,2,2,1,1,1,1
 
+    episode_rewards = [] # 记录每步的reward
     success_actions = []
-    max_episode = 100
+    max_episode = 10000
     for episode in range(max_episode):
         # initial observation
         observation = env.reset()
@@ -58,7 +62,15 @@ def update():
                     row = [f'[{episode}/{max_episode}]', '-'.join(action_path)]
                     print(row)
                     success_actions.append(row)
+                
+                episode_rewards.append(reward)
                 break
+        
+        # 检查连续TARGET_TIMES次都找到宝藏的回合数
+        if len(episode_rewards) > TARGET_TIMES and episode_rewards[-TARGET_TIMES:] == [1] * TARGET_TIMES:
+            print(f'连续 {TARGET_TIMES} 次找到宝藏，共训练 {episode} 次')
+            break
+
 
     pd.DataFrame(success_actions, columns=['episode', 'actions']).to_csv('success_actions.csv')
     # end of game

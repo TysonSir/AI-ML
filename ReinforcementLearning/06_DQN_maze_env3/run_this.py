@@ -24,6 +24,7 @@ import maze_env
 
 # 训练目标：连续 TARGET_TIMES 次找到宝藏
 TARGET_TIMES = 10
+EDUCATE_FIRST = False # 是否先用正确的步骤训练一下
 
 # Hyper Parameters
 BATCH_SIZE = 32
@@ -108,7 +109,6 @@ class DQN(object):
 dqn = DQN()
 
 
-EDUCATE_FIRST = False # 是否先用正确的步骤训练一下
 def update():
     if EDUCATE_FIRST:
         df_textbook = pd.read_csv("../05_QL_maze_env2/success_actions.csv", index_col=0)

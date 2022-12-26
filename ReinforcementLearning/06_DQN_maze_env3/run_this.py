@@ -25,7 +25,7 @@ import maze_env
 # Hyper Parameters
 BATCH_SIZE = 32
 LR = 0.01                   # learning rate
-EPSILON = 0.9               # greedy policy
+EPSILON = 0.6               # greedy policy
 GAMMA = 0.9                 # reward discount
 TARGET_REPLACE_ITER = 200   # target update frequency
 MEMORY_CAPACITY = 2000
@@ -115,7 +115,7 @@ def update():
 
     print('\nCollecting experience...')
     success_num = 0
-    for i_episode in range(400):
+    for i_episode in range(1400):
         s = env.reset()
         ep_r = 0
         i_step = 0

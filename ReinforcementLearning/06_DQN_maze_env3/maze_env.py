@@ -20,10 +20,18 @@ from PIL import Image, ImageTk # pip install Pillow
 work_dir = os.path.dirname(os.path.realpath(__file__))
 os.chdir(work_dir)
 
-UNIT = 40   # pixels
+DEFAULT_MAZE_MAP = \
+[
+    [0, 0, 1, 0, 0, 0, 0],
+    [0, 0, 1, 0, 0, 0, 0],
+    [0, 0, 1, 0, 0, 1, 0],
+    [0, 0, 0, 0, 1, 0, 0],
+    [0, 0, 0, 1, 0, 0, 2],
+]
 
-MAZE_H = 5  # grid height
-MAZE_W = 5  # grid width
+UNIT = 40   # pixels
+MAZE_H = len(DEFAULT_MAZE_MAP)  # grid height
+MAZE_W = len(DEFAULT_MAZE_MAP[0])  # grid width
 
 class Maze(tk.Tk, object):
     def __init__(self, is_quick=False):
@@ -45,7 +53,7 @@ class Maze(tk.Tk, object):
         return self.canvas.create_image(start_x, start_y, anchor=tk.NW, image=self.img_list[-1][1])
 
     def _create_hell(self, origin, x, y):
-        x, y = x - 1, y - 1
+        # x, y = x - 1, y - 1
         hell_center = origin + np.array([UNIT * y, UNIT * x])
         hell = self.canvas.create_rectangle(
             hell_center[0] - 15, hell_center[1] - 15,
@@ -86,15 +94,14 @@ class Maze(tk.Tk, object):
         # create origin
         origin = np.array([20, 20])
 
-        self._create_hell(origin, 2, 2)
-        self._create_hell(origin, 2, 4)
-        self._create_hell(origin, 3, 4)
-        self._create_hell(origin, 4, 1)
-        self._create_hell(origin, 4, 5)
-        self._create_hell(origin, 5, 3)
+        # draw hell
+        for row in range(MAZE_H):
+            for col in range(MAZE_W):
+                if DEFAULT_MAZE_MAP[row][col] == 1:
+                    self._create_hell(origin, row, col)
 
         # create oval
-        oval_x, oval_y = (MAZE_W - 1), (MAZE_H - 2)
+        oval_x, oval_y = (MAZE_H - 1), (MAZE_W - 1)
         oval_center = origin + np.array([UNIT * oval_y, UNIT * oval_x])
         self.oval = self.canvas.create_oval(
             oval_center[0] - 15, oval_center[1] - 15,

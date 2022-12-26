@@ -27,7 +27,7 @@ BATCH_SIZE = 32
 LR = 0.01                   # learning rate
 EPSILON = 0.9               # greedy policy
 GAMMA = 0.9                 # reward discount
-TARGET_REPLACE_ITER = 100   # target update frequency
+TARGET_REPLACE_ITER = 200   # target update frequency
 MEMORY_CAPACITY = 2000
 
 env = maze_env.Maze(is_quick=True)
@@ -105,7 +105,7 @@ class DQN(object):
 dqn = DQN()
 
 
-EDUCATE_FIRST = True # 是否先用正确的步骤训练一下
+EDUCATE_FIRST = False # 是否先用正确的步骤训练一下
 def update():
     if EDUCATE_FIRST:
         df_textbook = pd.read_csv("../05_QL_maze_env2/success_actions.csv", index_col=0)

@@ -14,6 +14,7 @@ gym                 0.26.2
 gym-notices         0.0.8
 pygame              2.1.0
 """
+import pandas as pd
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -103,14 +104,25 @@ class DQN(object):
 
 dqn = DQN()
 
+
+EDUCATE_FIRST = True # 是否先用正确的步骤训练一下
 def update():
+    if EDUCATE_FIRST:
+        df_textbook = pd.read_csv("../05_QL_maze_env2/success_actions.csv", index_col=0)
+        list_textbook = []
+        for row in df_textbook.itertuples():
+            list_textbook.append(row[2].split('-')) # actions: 3,2,0,1,1,1,2,2,0,0,2,0,2,2,1,1,1,1
+
     print('\nCollecting experience...')
     for i_episode in range(400):
         s = env.reset()
         ep_r = 0
+        i_step = 0
         while True:
             env.render()
             a = dqn.choose_action(s)
+            if EDUCATE_FIRST and len(list_textbook) > i_episode:
+                a = int(list_textbook[i_episode][i_step])
 
             # take action
             s_, r, done = env.step(a)
@@ -121,12 +133,15 @@ def update():
             if dqn.memory_counter > MEMORY_CAPACITY:
                 dqn.learn()
                 if done:
-                    print('Ep: ', i_episode,
-                        '| Ep_r: ', round(ep_r, 2))
-
+                    pass
+                    # print('Ep: ', i_episode,
+                    #     '| Ep_r: ', round(ep_r, 2))
             if done:
+                if r == 1:
+                    print([f'[{i_episode}] reward={r}'])
                 break
             s = s_
+            i_step += 1
 
     # end of game
     print('game over')

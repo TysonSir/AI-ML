@@ -22,6 +22,9 @@ from torch.autograd import Variable
 import numpy as np
 import maze_env
 
+# 训练目标：连续 TARGET_TIMES 次找到宝藏
+TARGET_TIMES = 10
+
 # Hyper Parameters
 BATCH_SIZE = 32
 LR = 0.01                   # learning rate
@@ -114,6 +117,7 @@ def update():
             list_textbook.append(row[2].split('-')) # actions: 3,2,0,1,1,1,2,2,0,0,2,0,2,2,1,1,1,1
 
     print('\nCollecting experience...')
+    episode_rewards = [] # 记录每步的reward
     success_num = 0
     for i_episode in range(1400):
         s = env.reset()
@@ -141,10 +145,15 @@ def update():
                 if r == 1:
                     print([f'[{i_episode}] reward={r}'])
                     success_num += 1
+                episode_rewards.append(r)
                 break
             s = s_
             i_step += 1
 
+        # 检查连续TARGET_TIMES次都找到宝藏的回合数
+        if len(episode_rewards) > TARGET_TIMES and episode_rewards[-TARGET_TIMES:] == [1] * TARGET_TIMES:
+            print(f'连续 {TARGET_TIMES} 次找到宝藏，共训练 {i_episode} 次，踩坑 {episode_rewards.count(-1)} 次')
+            break
     # end of game
     print('game over.', f'success {success_num} times.')
     env.destroy()

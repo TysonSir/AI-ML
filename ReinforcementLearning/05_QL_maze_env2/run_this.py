@@ -68,7 +68,7 @@ def update():
         
         # 检查连续TARGET_TIMES次都找到宝藏的回合数
         if len(episode_rewards) > TARGET_TIMES and episode_rewards[-TARGET_TIMES:] == [1] * TARGET_TIMES:
-            print(f'连续 {TARGET_TIMES} 次找到宝藏，共训练 {episode} 次')
+            print(f'连续 {TARGET_TIMES} 次找到宝藏，共训练 {episode} 次，踩坑 {episode_rewards.count(-1)} 次')
             break
 
 

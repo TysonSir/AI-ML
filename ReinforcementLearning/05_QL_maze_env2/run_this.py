@@ -15,8 +15,15 @@ import pandas as pd
 from maze_env import Maze
 from RL_brain import QLearningTable
 
+EDUCATE_FIRST = True # 是否先用正确的步骤训练一下
 
 def update():
+    if EDUCATE_FIRST:
+        df_textbook = pd.read_csv("success_actions.csv", index_col=0)
+        list_textbook = []
+        for row in df_textbook.itertuples():
+            list_textbook.append(row[2].split('-')) # actions: 3,2,0,1,1,1,2,2,0,0,2,0,2,2,1,1,1,1
+
     success_actions = []
     max_episode = 100
     for episode in range(max_episode):
@@ -24,12 +31,15 @@ def update():
         observation = env.reset()
 
         action_path = []
+        i_step = 0
         while True:
             # fresh env
             env.render()
 
             # RL choose action based on observation
             action = RL.choose_action(str(observation))
+            if EDUCATE_FIRST and len(list_textbook) > episode:
+                action = int(list_textbook[episode][i_step])
             action_path.append(str(action))
 
             # RL take action and get next observation and reward
@@ -40,6 +50,7 @@ def update():
 
             # swap observation
             observation = observation_
+            i_step += 1
 
             # break while loop when end of this episode
             if done:
@@ -48,7 +59,6 @@ def update():
                     print(row)
                     success_actions.append(row)
                 break
-
 
     pd.DataFrame(success_actions, columns=['episode', 'actions']).to_csv('success_actions.csv')
     # end of game
@@ -62,4 +72,4 @@ if __name__ == "__main__":
     env.after(100, update)
     env.mainloop()
 
-    RL.print_q_table('Q-Table.csv')
+    # RL.print_q_table('Q-Table.csv')

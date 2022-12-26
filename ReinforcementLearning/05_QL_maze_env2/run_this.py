@@ -46,10 +46,10 @@ def update():
     env.destroy()
 
 if __name__ == "__main__":
-    env = Maze(is_quick=True)
+    env = Maze(is_quick=False)
     RL = QLearningTable(actions=list(range(env.n_actions)))
 
     env.after(100, update)
     env.mainloop()
 
-    RL.print_q_table()
+    RL.print_q_table('Q-Table.csv')

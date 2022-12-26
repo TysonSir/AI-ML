@@ -8,6 +8,7 @@ View more on my tutorial page: https://morvanzhou.github.io/tutorials/
 import numpy as np
 import pandas as pd
 
+INIT_Q_TABLE = True
 
 class QLearningTable:
     def __init__(self, actions, learning_rate=0.01, reward_decay=0.9, e_greedy=0.9):
@@ -15,7 +16,13 @@ class QLearningTable:
         self.lr = learning_rate
         self.gamma = reward_decay
         self.epsilon = e_greedy
+
         self.q_table = pd.DataFrame(columns=self.actions, dtype=np.float64)
+        if INIT_Q_TABLE:
+            init_df = pd.read_csv('Q-Table.csv', index_col=0)
+            init_df.rename(columns={'0':0,'1':1,'2':2,'3':3}, inplace=True)
+            self.q_table = init_df
+
 
     def choose_action(self, observation):
         self.check_state_exist(observation)
@@ -50,5 +57,7 @@ class QLearningTable:
                 ).to_frame().T
             ])
 
-    def print_q_table(self):
+    def print_q_table(self, csv_path='Q-Table-debug.csv'):
         print('\r\nQ-table:\n', self.q_table, '\n')
+        if not INIT_Q_TABLE:
+            self.q_table.to_csv(csv_path)

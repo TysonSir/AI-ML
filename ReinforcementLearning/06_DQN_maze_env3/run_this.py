@@ -24,7 +24,7 @@ import maze_env
 
 # 训练目标：连续 TARGET_TIMES 次找到宝藏
 TARGET_TIMES = 10
-EDUCATE_FIRST = False # 是否先用正确的步骤训练一下
+EDUCATE_FIRST = True # 是否先用正确的步骤训练一下
 
 # Hyper Parameters
 BATCH_SIZE = 32
@@ -32,7 +32,7 @@ LR = 0.01                   # learning rate
 EPSILON = 0.6               # greedy policy
 GAMMA = 0.9                 # reward discount
 TARGET_REPLACE_ITER = 200   # target update frequency
-MEMORY_CAPACITY = 2000
+MEMORY_CAPACITY = 200
 
 env = maze_env.Maze(is_quick=True)
 N_ACTIONS = len(env.action_space)
@@ -110,49 +110,50 @@ dqn = DQN()
 
 
 def update():
+    list_textbook = []
     if EDUCATE_FIRST:
         df_textbook = pd.read_csv("../05_QL_maze_env2/success_actions.csv", index_col=0)
-        list_textbook = []
         for row in df_textbook.itertuples():
             list_textbook.append(row[2].split('-')) # actions: 3,2,0,1,1,1,2,2,0,0,2,0,2,2,1,1,1,1
 
     print('\nCollecting experience...')
     episode_rewards = [] # 记录每步的reward
     success_num = 0
-    for i_episode in range(1400):
+    for episode in range(1400):
         s = env.reset()
         ep_r = 0
         i_step = 0
         while True:
             env.render()
-            a = dqn.choose_action(s)
-            if EDUCATE_FIRST and len(list_textbook) > i_episode:
-                a = int(list_textbook[i_episode][i_step])
+            action = dqn.choose_action(s)
+            if EDUCATE_FIRST and len(list_textbook) > episode:
+                action = int(list_textbook[episode][i_step])
 
             # take action
-            s_, r, done = env.step(a)
+            s_, reward, done = env.step(action)
 
-            dqn.store_transition(s, a, r, s_)
+            dqn.store_transition(s, action, reward, s_)
 
-            ep_r += r
+            ep_r += reward
             if dqn.memory_counter > MEMORY_CAPACITY:
                 dqn.learn()
                 if done:
                     pass
-                    # print('Ep: ', i_episode,
+                    # print('Ep: ', episode,
                     #     '| Ep_r: ', round(ep_r, 2))
             if done:
-                if r == 1:
-                    print([f'[{i_episode}] reward={r}'])
+                if reward == 1:
+                    print([f'[{episode}] reward={reward}'])
                     success_num += 1
-                episode_rewards.append(r)
+                if episode > len(list_textbook):
+                    episode_rewards.append(reward)
                 break
             s = s_
             i_step += 1
 
         # 检查连续TARGET_TIMES次都找到宝藏的回合数
-        if len(episode_rewards) > TARGET_TIMES and episode_rewards[-TARGET_TIMES:] == [1] * TARGET_TIMES:
-            print(f'连续 {TARGET_TIMES} 次找到宝藏，共训练 {i_episode} 次，踩坑 {episode_rewards.count(-1)} 次')
+        if episode > len(list_textbook) and len(episode_rewards) > TARGET_TIMES and episode_rewards[-TARGET_TIMES:] == [1] * TARGET_TIMES:
+            print(f'连续 {TARGET_TIMES} 次找到宝藏，共训练 {episode - len(list_textbook)} 次，踩坑 {episode_rewards.count(-1)} 次')
             break
     # end of game
     print('game over.', f'success {success_num} times.')

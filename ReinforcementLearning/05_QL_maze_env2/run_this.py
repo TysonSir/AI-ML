@@ -18,13 +18,13 @@ from RL_brain import QLearningTable
 # 训练目标：连续 TARGET_TIMES 次找到宝藏
 TARGET_TIMES = 10
 
-EDUCATE_FIRST = False # 是否先用正确的步骤训练一下
+EDUCATE_FIRST = True # 是否先用正确的步骤训练一下
 OUTPUT_ACTIONS_CSV = False # 输出成功路径
 
 def update():
+    list_textbook = []
     if EDUCATE_FIRST:
         df_textbook = pd.read_csv("success_actions.csv", index_col=0)
-        list_textbook = []
         for row in df_textbook.itertuples():
             list_textbook.append(row[2].split('-')) # actions: 3,2,0,1,1,1,2,2,0,0,2,0,2,2,1,1,1,1
 
@@ -64,12 +64,13 @@ def update():
                     print(row)
                     success_actions.append(row)
                 
-                episode_rewards.append(reward)
+                if episode > len(list_textbook):
+                    episode_rewards.append(reward)
                 break
         
         # 检查连续TARGET_TIMES次都找到宝藏的回合数
-        if len(episode_rewards) > TARGET_TIMES and episode_rewards[-TARGET_TIMES:] == [1] * TARGET_TIMES:
-            print(f'连续 {TARGET_TIMES} 次找到宝藏，共训练 {episode} 次，踩坑 {episode_rewards.count(-1)} 次')
+        if episode > len(list_textbook) and len(episode_rewards) > TARGET_TIMES and episode_rewards[-TARGET_TIMES:] == [1] * TARGET_TIMES:
+            print(f'连续 {TARGET_TIMES} 次找到宝藏，共训练 {episode - len(list_textbook)} 次，踩坑 {episode_rewards.count(-1)} 次')
             break
 
     if OUTPUT_ACTIONS_CSV:

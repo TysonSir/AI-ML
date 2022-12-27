@@ -19,6 +19,7 @@ from RL_brain import QLearningTable
 TARGET_TIMES = 10
 
 EDUCATE_FIRST = False # 是否先用正确的步骤训练一下
+OUTPUT_ACTIONS_CSV = False # 输出成功路径
 
 def update():
     if EDUCATE_FIRST:
@@ -71,8 +72,8 @@ def update():
             print(f'连续 {TARGET_TIMES} 次找到宝藏，共训练 {episode} 次，踩坑 {episode_rewards.count(-1)} 次')
             break
 
-
-    pd.DataFrame(success_actions, columns=['episode', 'actions']).to_csv('success_actions.csv')
+    if OUTPUT_ACTIONS_CSV:
+        pd.DataFrame(success_actions, columns=['episode', 'actions']).to_csv('success_actions.csv')
     # end of game
     print('game over', f'success {len(success_actions)} times.')
     env.destroy()

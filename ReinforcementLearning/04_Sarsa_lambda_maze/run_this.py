@@ -15,9 +15,9 @@ TARGET_TIMES = 10
 EDUCATE_FIRST = True # 是否先用正确的步骤训练一下
 
 def update():
+    list_textbook = []
     if EDUCATE_FIRST:
         df_textbook = pd.read_csv("../05_QL_maze_env2/success_actions.csv", index_col=0)
-        list_textbook = []
         for row in df_textbook.itertuples():
             list_textbook.append(row[2].split('-')) # actions: 3,2,0,1,1,1,2,2,0,0,2,0,2,2,1,1,1,1
 
@@ -63,12 +63,13 @@ def update():
                 if reward == 1:
                     print([f'[{episode}] reward={reward}'])
                     # success_num += 1
-                episode_rewards.append(reward)
+                if episode > len(list_textbook):
+                    episode_rewards.append(reward)
                 break
 
         # 检查连续TARGET_TIMES次都找到宝藏的回合数
         if episode > len(list_textbook) and len(episode_rewards) > TARGET_TIMES and episode_rewards[-TARGET_TIMES:] == [1] * TARGET_TIMES:
-            print(f'连续 {TARGET_TIMES} 次找到宝藏，共训练 {episode} 次，踩坑 {episode_rewards.count(-1)} 次')
+            print(f'连续 {TARGET_TIMES} 次找到宝藏，共训练 {episode - len(list_textbook)} 次，踩坑 {episode_rewards.count(-1)} 次')
             break
     # end of game
     print('game over')

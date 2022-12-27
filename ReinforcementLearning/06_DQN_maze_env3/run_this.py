@@ -29,10 +29,10 @@ EDUCATE_FIRST = True # 是否先用正确的步骤训练一下
 # Hyper Parameters
 BATCH_SIZE = 32
 LR = 0.01                   # learning rate
-EPSILON = 0.6               # greedy policy
+EPSILON = 0.9               # greedy policy
 GAMMA = 0.9                 # reward discount
 TARGET_REPLACE_ITER = 200   # target update frequency
-MEMORY_CAPACITY = 200
+MEMORY_CAPACITY = 2000      # 小人走的步数
 
 env = maze_env.Maze(is_quick=True)
 N_ACTIONS = len(env.action_space)
@@ -119,7 +119,7 @@ def update():
     print('\nCollecting experience...')
     episode_rewards = [] # 记录每步的reward
     success_num = 0
-    for episode in range(1400):
+    for episode in range(14000):
         s = env.reset()
         ep_r = 0
         i_step = 0
@@ -151,6 +151,8 @@ def update():
             s = s_
             i_step += 1
 
+        if episode % 100 == 0:
+            print(f'episode={episode}')
         # 检查连续TARGET_TIMES次都找到宝藏的回合数
         if episode > len(list_textbook) and len(episode_rewards) > TARGET_TIMES and episode_rewards[-TARGET_TIMES:] == [1] * TARGET_TIMES:
             print(f'连续 {TARGET_TIMES} 次找到宝藏，共训练 {episode - len(list_textbook)} 次，踩坑 {episode_rewards.count(-1)} 次')

@@ -45,7 +45,7 @@ def update():
     env.destroy()
 
 if __name__ == "__main__":
-    env = Maze(is_quick=True)
+    env = Maze(is_quick=False)
     RL = SarsaTable(actions=list(range(env.n_actions)))
 
     env.after(100, update)

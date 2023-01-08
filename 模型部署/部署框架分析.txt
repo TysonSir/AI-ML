@@ -1,0 +1,20 @@
+链接：https://baijiahao.baidu.com/s?id=1714111587892605090&wfr=spider&for=pc
+
+腾讯公司开发的移动端平台部署工具——NCNN；
+
+Intel公司针对自家设备开开发的部署工具——OpenVino；
+
+NVIDIA公司针对自家GPU开发的部署工具——TensorRT；
+
+Google针对自家硬件设备和深度学习框架开发的部署工具——MediaPipe；
+
+由微软、亚马逊 、Facebook 和 IBM 等公司共同开发的开放神经网络交换格式——ONNX(Open Neural Network Exchange)。框架友好，兼容性搞不好会有问题。
+
+除此之外，还有一些深度学习框架有自己的专用部署服务：
+比如TensorFlow自己提供的部署服务：TensorFlow Serving、TensorFlow Lite，
+pytorch自己提供的部署服务：libtorch。（基于C++库的）
+
+
+基于Web框架自己部署的，比较灵活。（https://blog.csdn.net/weixin_45632168/article/details/114679263）
+
+nuclio：通用的serviceless框架，有部署的操作界面

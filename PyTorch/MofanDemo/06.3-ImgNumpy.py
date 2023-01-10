@@ -52,10 +52,17 @@ def image2numpy(image_path):
     image_array = np.array(im) # 转换成np.ndarray格式
     return image_array
 
+def numpy2tensor(image_array):
+    # print(image_array[None].shape) # (1, 28, 28), 提升维度
+    return torch.from_numpy(image_array[None])
+
 if __name__ == '__main__':
     image_path = 'num.png'
-    # image_array = get_numpy_data(1)
-    show_data(1)
+    image_array = get_numpy_data(1)
+    
+    image_tensor = numpy2tensor(image_array)
+    print(image_tensor)
+    # show_data(1)
     # numpy2image(image_array, image_path)
     # image_array = image2numpy(image_path)
     # print(image_array)

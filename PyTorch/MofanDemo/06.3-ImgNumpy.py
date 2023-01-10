@@ -7,6 +7,7 @@ import torch.utils.data as Data
 import torchvision
 import matplotlib.pyplot as plt
 from PIL import Image
+import numpy as np
 
 # torch.manual_seed(1)    # reproducible
 
@@ -33,9 +34,12 @@ train_data = torchvision.datasets.MNIST(
 def get_numpy_data(id):
     return train_data.train_data[id].numpy()
 
-def show_mnist(image_array):
-    plt.imshow(image_array, cmap='gray')
-    plt.title('%i' % train_data.train_labels[0])
+def get_label(id):
+    return train_data.train_labels[0]
+
+def show_data(id):
+    plt.imshow(get_numpy_data(id), cmap='gray')
+    plt.title('%i' % get_label(id))
     plt.show()
 
 def numpy2image(image_array, image_path):
@@ -43,7 +47,15 @@ def numpy2image(image_array, image_path):
     im = im.convert('L')  # 这样才能转为灰度图，如果是彩色图则改L为‘RGB’
     im.save(image_path)
 
+def image2numpy(image_path):
+    im = Image.open(image_path)
+    image_array = np.array(im) # 转换成np.ndarray格式
+    return image_array
+
 if __name__ == '__main__':
-    image_array = get_numpy_data(1)
-    show_mnist(image_array)
-    numpy2image(image_array, 'num.png')
+    image_path = 'num.png'
+    # image_array = get_numpy_data(1)
+    show_data(1)
+    # numpy2image(image_array, image_path)
+    # image_array = image2numpy(image_path)
+    # print(image_array)

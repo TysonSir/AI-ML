@@ -38,7 +38,14 @@ def get_numpy_data(id):
     return train_data.train_data[id].numpy()
 
 def get_label(id):
-    return train_data.train_labels[0]
+    return train_data.train_labels[id]
+
+def save_images(dir='mnist_images/'):
+    for id in range(10):
+        image_array = get_numpy_data(id)
+        label = get_label(id)
+        img_path = os.path.join(dir, f'{id}-{label}.png')
+        numpy2image(image_array, img_path)
 
 def show_data(id):
     plt.imshow(get_numpy_data(id), cmap='gray')
@@ -108,12 +115,12 @@ def predict(net, image_array):
     idx_max = torch.max(out, 1)[1].data.numpy()[0]
     return idx_max
 
-if __name__ == '__main__':
-    image_path = 'num.png'
-    # image_array = get_numpy_data(0)
-    # numpy2image(image_array, image_path)
 
-    net = load_net('mnist.pkl')
+if __name__ == '__main__':
+    # save_images()
+    image_path = 'num_images/7-3.png'
+
+    net = load_net('mnist.pkl') # 执行06.2生成
     image_array = load_image(image_path)
     out = predict(net, image_array)
     show_result(image_array, out)

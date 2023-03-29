@@ -39,4 +39,24 @@ def test2():
     print([subtree for tree in treebank.parsed_sents() \
             for subtree in tree.subtrees(filter)])
 
-test2()
+def test1_ch():
+    grammar = nltk.CFG.fromstring("""
+    S -> NP VP
+    VP -> V NP | V NP PP
+    PP -> P NP
+    V -> "看" | "吃" | "走" | P N V
+    NP -> "张三" | "李四" | "王五" | Det N | Det N PP
+    Det -> "一个" | "这个" | "我的"
+    N -> "人" | "狗" | "猫" | "望远镜" | "公园"
+    P -> "里面" | "上面" | "通过" | "和一起"
+    """)
+    sent = '张三 看 我的 狗'.split()
+    sent = '张三 通过 望远镜 看 我的 狗'.split()
+    rd_parser = nltk.RecursiveDescentParser(grammar)
+    tree_generator = rd_parser.parse(sent)
+
+    for tree in tree_generator:
+        print('tree: ',tree)
+        tree.draw()
+
+test1_ch()

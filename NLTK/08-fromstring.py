@@ -45,13 +45,16 @@ def test1_ch():
     VP -> V NP | V NP PP
     PP -> P NP
     V -> "看" | "吃" | "走" | P N V
-    NP -> "张三" | "李四" | "王五" | Det N | Det N PP
-    Det -> "一个" | "这个" | "我的"
+    NP -> "张三" | "李四" | "王五" | Det N | Det N PP | ADJ NP
+    Det -> "一只" | "这个" | "我的"
     N -> "人" | "狗" | "猫" | "望远镜" | "公园"
-    P -> "里面" | "上面" | "通过" | "和一起"
+    P -> "里面" | "上面" | "通过" | "在"
+    ADJ -> "帅气的" | "漂亮的"
     """)
     sent = '张三 看 我的 狗'.split()
     sent = '张三 通过 望远镜 看 我的 狗'.split()
+    sent = '帅气的 张三 通过 望远镜 看 我的 狗'.split()
+    sent = '漂亮的 李四 在 公园 看 一只 猫'.split()
     rd_parser = nltk.RecursiveDescentParser(grammar)
     tree_generator = rd_parser.parse(sent)
 
